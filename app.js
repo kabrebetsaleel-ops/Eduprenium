@@ -3,7 +3,7 @@
 // ╚══════════════════════════════════════════════════════════╝
 
 const PRODUITS = [
-  { id: 1, type: "exercices", titre: "Derivabilité", matiere: "Mathématiques", niveau: "premiere", description: "Ce pdf contient 34 exercices pour vous permettre de vous entrenez et maitrisez completement la derivalite , c'est 34 exercices sont aussi corrigés", apercu: "apercu_exercice_maths_derivabilite_1_premiere.pdf", prix: 200, icon: "📘", bg: "#eef2ff" },
+  { id: 1, type: "exercices", titre: "Derivabilité", matiere: "Mathématiques", niveau: "premiere", description: "Ce pdf contient 34 exercices pour vous permettre de vous entrenez et maitrisez completement la derivalite , c'est 34 exercices sont aussi corrigés", apercu: "apercu_exercice_maths_derivabilite_1_premiere.pdf", prix: 1, icon: "📘", bg: "#eef2ff" },
   { id: 2, type: "annales", titre: "9 Devoirs", matiere: "Mathématiques", niveau: "premiere", description: "Ce pdf contient 9 devoirs pour vous , n'hesitez pas de les traiter pour connaitre votre niveau.", apercu: "apercu_devoir_maths_1_premiere.pdf", prix: 200, icon: "📘", bg: "#eef2ff" },
 ];
 
