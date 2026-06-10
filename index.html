@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduPremium — Cours, Exercices & Annales BAC Burkina Faso</title>
+  <meta name="description" content="Cours résumés, exercices corrigés et annales BAC pour lycéens au Burkina Faso. Toutes matières, Seconde, Première et Terminale. Paiement Wave & Orange Money."/>
+  <meta name="keywords" content="cours lycée Burkina Faso, annales BAC Burkina, exercices corrigés terminale, ressources scolaires premium, révision BAC Burkina"/>
+  <meta property="og:title" content="EduPremium — Ressources scolaires premium Burkina Faso"/>
+  <meta property="og:description" content="Cours résumés, exercices corrigés et annales BAC pour lycéens. Paiement Wave & Orange Money."/>
+  <meta property="og:type" content="website"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="auth.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     PAGE D'AUTHENTIFICATION (overlay)
+     ════════════════════════════════════════════════════════ -->
+<div id="auth-overlay" style="display:none;">
+  <div class="auth-box">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <span class="logo-icon">🎓</span>
+      <span class="logo-text">Edu<span>Premium</span></span>
+    </div>
+
+    <h2 id="auth-title">Bon retour ! 👋</h2>
+    <p id="auth-subtitle">Connecte-toi pour accéder à tes documents</p>
+
+    <!-- Bouton Google -->
+    <button class="google-btn" onclick="loginWithGoogle()">
+      <span class="google-icon">🔵</span>
+      Continuer avec Google
+    </button>
+
+    <!-- Séparateur -->
+    <div class="auth-separator"><span>ou</span></div>
+
+    <!-- ─── FORMULAIRE CONNEXION ─── -->
+    <div id="login-form">
+      <div class="auth-error" id="login-error"></div>
+      <div class="auth-success" id="login-success"></div>
+
+      <div class="auth-field">
+        <label>Email</label>
+        <div class="input-wrapper">
+          <input type="email" id="login-email" placeholder="ton@email.com"/>
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label>Mot de passe</label>
+        <div class="input-wrapper">
+          <input type="password" id="login-password" placeholder="••••••••"/>
+          <button class="toggle-pwd" onclick="togglePassword('login-password')">👁️</button>
+        </div>
+      </div>
+
+      <button class="auth-submit-btn" id="login-btn" onclick="loginWithEmail()">
+        Se connecter
+      </button>
+
+      <div class="auth-switch">
+        Pas encore de compte ?
+        <button onclick="switchAuthMode('register')">S'inscrire</button>
+      </div>
+    </div>
+
+    <!-- ─── FORMULAIRE INSCRIPTION ─── -->
+    <div id="register-form" style="display:none;">
+      <div class="auth-error" id="register-error"></div>
+      <div class="auth-success" id="register-success"></div>
+
+      <div class="auth-field">
+        <label>Prénom et nom</label>
+        <input type="text" id="reg-nom" placeholder="Ex: Betsaleel KABRE"/>
+      </div>
+
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="ton@email.com"/>
+      </div>
+
+      <div class="auth-field">
+        <label>Mot de passe</label>
+        <div class="input-wrapper">
+          <input type="password" id="reg-password" placeholder="Min. 6 caractères"/>
+          <button class="toggle-pwd" onclick="togglePassword('reg-password')">👁️</button>
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label>Confirmer le mot de passe</label>
+        <div class="input-wrapper">
+          <input type="password" id="reg-confirm" placeholder="Répète ton mot de passe"/>
+          <button class="toggle-pwd" onclick="togglePassword('reg-confirm')">👁️</button>
+        </div>
+      </div>
+
+      <button class="auth-submit-btn" id="register-btn" onclick="registerWithEmail()">
+        S'inscrire
+      </button>
+
+      <div class="auth-switch">
+        Déjà un compte ?
+        <button onclick="switchAuthMode('login')">Se connecter</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     CONTENU PRINCIPAL (visible après connexion)
+     ════════════════════════════════════════════════════════ -->
+<div id="main-content" style="display:none;">
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <a class="nav-logo" href="#" onclick="showPage('home'); return false;">
+      <span class="logo-icon">🎓</span>
+      <span class="logo-text">Edu<span>Premium</span></span>
+    </a>
+    <div class="nav-links">
+      <button onclick="showPage('home')" id="btn-home" class="active">Accueil</button>
+      <button onclick="showPage('boutique')" id="btn-boutique">Boutique</button>
+      <button onclick="showPage('contact')" id="btn-contact">Contact</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="cart-btn" onclick="showPage('panier')">
+        🛒 <span id="cart-count">0</span>
+      </button>
+      <!-- Profil utilisateur -->
+      <div class="user-dropdown">
+        <div class="user-profile" onclick="toggleDropdown()">
+          <img id="user-avatar" src="" alt="" style="display:none;"/>
+          <div id="user-initials"></div>
+          <span id="user-name"></span>
+          <span>▾</span>
+        </div>
+        <div class="dropdown-menu" id="dropdown-menu">
+          <button class="dropdown-item danger" onclick="logout()">
+            🚪 Se déconnecter
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PAGE ACCUEIL -->
+  <div id="page-home">
+    <section class="hero">
+      <div class="hero-badge">✨ Ressources premium pour lycéens</div>
+      <h1>Réussis tes examens<br/><span>avec les meilleurs</span><br/>documents !</h1>
+      <p>Cours résumés, exercices corrigés et annales avec corrections détaillées. Toutes les matières, tous les niveaux.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('boutique')">Voir la boutique →</button>
+        <button class="btn-ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Comment ça marche ?</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span>6</span>Matières</div>
+        <div class="stat-sep"></div>
+        <div class="stat"><span>3</span>Niveaux</div>
+        <div class="stat-sep"></div>
+        <div class="stat"><span>100%</span>Corrigés</div>
+      </div>
+    </section>
+
+    <section class="section" id="categories">
+      <div class="section-header">
+        <h2>Nos <span>catégories</span></h2>
+        <p>Tout ce qu'il te faut pour préparer tes examens</p>
+      </div>
+      <div class="cat-grid">
+        <div class="cat-card" onclick="filterAndGo('cours')">
+          <div class="cat-icon">📘</div>
+          <h3>Cours & Résumés</h3>
+          <p>Fiches condensées et claires pour maîtriser chaque chapitre rapidement.</p>
+          <span class="cat-tag">Populaire</span>
+        </div>
+        <div class="cat-card" onclick="filterAndGo('exercices')">
+          <div class="cat-icon">✏️</div>
+          <h3>Exercices Corrigés</h3>
+          <p>Des centaines d'exercices avec corrections détaillées étape par étape.</p>
+          <span class="cat-tag">Best-seller</span>
+        </div>
+        <div class="cat-card" onclick="filterAndGo('annales')">
+          <div class="cat-icon">📚</div>
+          <h3>Annales Corrigées</h3>
+          <p>Sujets d'examens des années passées avec corrections complètes.</p>
+          <span class="cat-tag">Essentiel</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="section-header">
+        <h2>Comment <span>ça marche ?</span></h2>
+        <p>Simple, rapide et sécurisé</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-icon">🛒</div>
+          <h3>Choisis ton document</h3>
+          <p>Parcours la boutique et ajoute les documents dont tu as besoin.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-icon">💸</div>
+          <h3>Paie par Wave / Orange Money</h3>
+          <p>Envoie le montant sur le numéro indiqué, c'est rapide et sécurisé.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-icon">📥</div>
+          <h3>Reçois ton PDF</h3>
+          <p>Après confirmation du paiement, tu reçois ton document immédiatement.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Produits <span>populaires</span></h2>
+        <button class="see-all" onclick="showPage('boutique')">Voir tout →</button>
+      </div>
+      <div class="products-grid" id="featured-products"></div>
+    </section>
+
+    <!-- TÉMOIGNAGES -->
+    <section class="section" id="temoignages">
+      <div class="section-header">
+        <h2>Ce que disent <span>nos élèves</span></h2>
+        <p>Ils ont utilisé EduPremium pour réussir leurs examens</p>
+      </div>
+      <div class="temoignages-grid">
+        <div class="temoignage-card">
+          <div class="temoignage-stars">⭐⭐⭐⭐⭐</div>
+          <p class="temoignage-text">"Les exercices corrigés en maths m'ont vraiment aidé. J'ai eu 14/20 en dérivabilité grâce à EduPremium !"</p>
+          <div class="temoignage-author">
+            <div class="temoignage-avatar">A</div>
+            <div><strong>Aminata S.</strong><span>Première A, Ouagadougou</span></div>
+          </div>
+        </div>
+        <div class="temoignage-card">
+          <div class="temoignage-stars">⭐⭐⭐⭐⭐</div>
+          <p class="temoignage-text">"Les annales sont top ! J'ai retrouvé exactement le type de sujets qui sont tombés au BAC. Je recommande vraiment."</p>
+          <div class="temoignage-author">
+            <div class="temoignage-avatar">I</div>
+            <div><strong>Issouf K.</strong><span>Terminale D, Bobo-Dioulasso</span></div>
+          </div>
+        </div>
+        <div class="temoignage-card">
+          <div class="temoignage-stars">⭐⭐⭐⭐⭐</div>
+          <p class="temoignage-text">"Le paiement par Wave était super rapide. J'ai reçu mon PDF en quelques minutes. Service sérieux et fiable !"</p>
+          <div class="temoignage-author">
+            <div class="temoignage-avatar">F</div>
+            <div><strong>Fatimata O.</strong><span>Terminale C, Koudougou</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="section-header">
+        <h2>Questions <span>fréquentes</span></h2>
+        <p>Tout ce que tu veux savoir avant d'acheter</p>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)"><span>📦 Comment je reçois mon document après paiement ?</span><span class="faq-arrow">▼</span></button>
+          <div class="faq-answer">Après avoir payé, tu remplis le formulaire de confirmation avec ton numéro de transaction. Tu es redirigé vers WhatsApp où ta commande est envoyée automatiquement. Betsaleel te répond et t'envoie ton PDF dès que le paiement est vérifié, généralement en moins de 30 minutes.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)"><span>💳 Quels moyens de paiement sont acceptés ?</span><span class="faq-arrow">▼</span></button>
+          <div class="faq-answer">On accepte <strong>Wave</strong> et <strong>Orange Money</strong>. Le numéro est le <strong>+226 06 62 57 15</strong> (KABRE Betsaleel). Sur la page de paiement, des boutons composent le code automatiquement avec le bon montant exact de ta commande.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)"><span>🔒 Est-ce que mon paiement est sécurisé ?</span><span class="faq-arrow">▼</span></button>
+          <div class="faq-answer">Oui ! Tu paies directement via Wave ou Orange Money sur ton téléphone. EduPremium ne touche jamais à tes identifiants bancaires. Le numéro de transaction sert uniquement à vérifier ton paiement.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)"><span>😕 Et si je ne reçois pas mon PDF ?</span><span class="faq-arrow">▼</span></button>
+          <div class="faq-answer">Contacte Betsaleel au <strong>+226 06 62 57 15</strong> sur WhatsApp en mentionnant ton numéro de transaction. Il te répondra rapidement pour régler le problème.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)"><span>👁️ Puis-je voir un aperçu avant d'acheter ?</span><span class="faq-arrow">▼</span></button>
+          <div class="faq-answer">Oui, certains documents ont un aperçu gratuit sur la carte produit. Clique sur "👁️ Aperçu gratuit" pour voir les premières pages avant d'acheter.</div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- fin page-home -->
+
+  <!-- PAGE BOUTIQUE -->
+  <div id="page-boutique" style="display:none;">
+    <div class="boutique-header">
+      <h2>La <span>Boutique</span></h2>
+      <p>Tous nos documents premium</p>
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterProducts('tous', this)">Tous</button>
+      <button class="filter-btn" onclick="filterProducts('cours', this)">📘 Cours</button>
+      <button class="filter-btn" onclick="filterProducts('exercices', this)">✏️ Exercices</button>
+      <button class="filter-btn" onclick="filterProducts('annales', this)">📚 Annales</button>
+      <button class="filter-btn" onclick="filterProducts('seconde', this)">Seconde</button>
+      <button class="filter-btn" onclick="filterProducts('premiere', this)">Première</button>
+      <button class="filter-btn" onclick="filterProducts('terminale', this)">Terminale</button>
+    </div>
+    <div class="products-grid" id="all-products"></div>
+  </div>
+
+  <!-- PAGE PANIER -->
+  <div id="page-panier" style="display:none;">
+    <div class="boutique-header"><h2>Mon <span>Panier</span></h2></div>
+    <div class="panier-content">
+      <div id="panier-items"></div>
+      <div class="panier-total" id="panier-total" style="display:none;">
+        <div class="total-line">
+          <span>Total</span>
+          <span id="total-prix"></span>
+        </div>
+        <button class="btn-primary" onclick="showPage('paiement')" style="width:100%;margin-top:16px;">
+          Procéder au paiement →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE PAIEMENT -->
+  <div id="page-paiement" style="display:none;">
+    <div class="boutique-header"><h2>💳 <span>Paiement</span></h2></div>
+    <div class="paiement-content">
+      <div class="paiement-card">
+        <h3>📋 Récapitulatif de ta commande</h3>
+        <div id="recap-items"></div>
+        <div class="recap-total">Total à payer : <strong id="recap-total"></strong></div>
+      </div>
+      <div class="paiement-card">
+        <h3>💸 Instructions de paiement</h3>
+        <div class="payment-methods">
+          <div class="payment-method wave">
+            <div class="pm-header"><span class="pm-icon">🔵</span><span class="pm-name">Wave</span></div>
+            <p>Envoie le montant exact au :</p>
+            <div class="phone-number">+226 06 62 57 15</div>
+            <p class="pm-note">Bénéficiaire : <strong>KABRE Betsaleel</strong></p>
+            <button class="pay-action-btn wave-btn" onclick="payerWave()">📲 Ouvrir Wave</button>
+          </div>
+          <div class="payment-method orange">
+            <div class="pm-header"><span class="pm-icon">🟠</span><span class="pm-name">Orange Money</span></div>
+            <p>Compose le code USSD ou clique le bouton :</p>
+            <div class="phone-number" id="om-code-display">*144*2*1*06625715*…#</div>
+            <p class="pm-note">Bénéficiaire : <strong>KABRE Betsaleel</strong></p>
+            <button class="pay-action-btn orange-btn" onclick="payerOrangeMoney()">📞 Composer le code</button>
+          </div>
+        </div>
+        <div class="payment-tip">
+          💡 <strong>Astuce :</strong> Clique sur le bouton de ton opérateur — le montant exact sera pré-rempli automatiquement !
+        </div>
+      </div>
+      <div class="paiement-card">
+        <h3>📸 Confirme ton paiement</h3>
+        <p style="color:var(--text-muted);margin-bottom:16px;">Après avoir payé, remplis ce formulaire. Tu vas être redirigé vers WhatsApp.</p>
+        <div class="form-group">
+          <label>Ton prénom et nom *</label>
+          <input type="text" id="f-nom" placeholder="Ex: Betsaleel KABRE"/>
+        </div>
+        <div class="form-group">
+          <label>Ton numéro de téléphone *</label>
+          <input type="tel" id="f-tel" placeholder="Ex: +226 XX XX XX XX"/>
+        </div>
+        <div class="form-group">
+          <label>Moyen de paiement utilisé *</label>
+          <select id="f-moyen" style="width:100%;border:2px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'Outfit',sans-serif;font-size:0.92rem;color:var(--text);background:var(--surface2);outline:none;cursor:pointer;">
+            <option value="">-- Sélectionne --</option>
+            <option value="Wave">🔵 Wave</option>
+            <option value="Orange Money">🟠 Orange Money</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Moyen de paiement utilisé *</label>
+          <select id="f-moyen" style="width:100%;border:2px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'Outfit',sans-serif;font-size:0.92rem;color:var(--text);background:var(--surface2);outline:none;cursor:pointer;">
+            <option value="">-- Sélectionne --</option>
+            <option value="Wave">🔵 Wave</option>
+            <option value="Orange Money">🟠 Orange Money</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Numéro de transaction *</label>
+          <input type="text" id="f-transaction" placeholder="Ex: TXN123456789"/>
+        </div>
+        <div class="form-group">
+          <label>Comment veux-tu recevoir tes PDF ? *</label>
+          <select id="f-livraison" onchange="toggleEmail()" style="width:100%;border:2px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'Outfit',sans-serif;font-size:0.92rem;color:var(--text);background:var(--surface2);outline:none;cursor:pointer;">
+            <option value="email">✉️ Email (envoi automatique instantané)</option>
+            <option value="whatsapp">📱 WhatsApp (envoi manuel)</option>
+          </select>
+        </div>
+        <div class="form-group" id="email-group" style="display:none;">
+          <label>Ton adresse email</label>
+          <input type="email" id="f-email" placeholder="Ex: ton@email.com"/>
+        </div>
+        <div class="form-group">
+          <label>Informations supplémentaires (optionnel)</label>
+          <textarea id="f-note" placeholder="Ex: Je veux seulement les chapitres 1 et 2..." style="width:100%;border:2px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'Outfit',sans-serif;font-size:0.92rem;color:var(--text);background:var(--surface2);outline:none;resize:vertical;min-height:90px;"></textarea>
+        </div>
+        <button class="btn-primary" onclick="confirmerPaiement()" style="width:100%;margin-top:8px;">
+          📧 Recevoir mes documents →
+        </button>
+        <p style="text-align:center;color:var(--text-muted);font-size:0.78rem;margin-top:12px;">
+          Email = envoi automatique instantané · WhatsApp = envoi manuel par Betsaleel 📲
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE CONFIRMATION -->
+  <div id="page-confirmation" style="display:none;">
+    <div class="confirmation-content">
+      <div class="confirm-icon">🎉</div>
+      <h2>Merci pour ta commande !</h2>
+      <p id="confirm-msg-email" style="display:none;">✅ Tes documents ont été envoyés à ton adresse email !<br/><span style="color:var(--text-muted);font-size:0.85rem;">Vérifie aussi tes spams si tu ne vois pas l'email.</span></p>
+      <p id="confirm-msg-whatsapp">Ta demande a bien été reçue sur WhatsApp.<br/>Tu recevras tes documents dès que le paiement sera confirmé.</p>
+      <p style="margin-top:12px;">En cas de problème : <strong>+226 06 62 57 15</strong></p>
+      <button class="btn-primary" onclick="showPage('home')" style="margin-top:32px;">Retour à l'accueil</button>
+    </div>
+  </div>
+
+  <!-- PAGE CONTACT -->
+  <div id="page-contact" style="display:none;">
+    <div class="boutique-header"><h2>📞 <span>Contact</span></h2></div>
+    <div class="contact-content">
+      <div class="contact-card">
+        <div class="contact-item">
+          <span>👤</span>
+          <div><strong>KABRE Betsaleel</strong><p>Créateur de EduPremium</p></div>
+        </div>
+        <div class="contact-item">
+          <span>📞</span>
+          <div><strong>Téléphone / Wave / Orange Money</strong><p><a href="tel:+22606625715">+226 06 62 57 15</a></p></div>
+        </div>
+        <div class="contact-item">
+          <span>✉️</span>
+          <div><strong>Email</strong><p><a href="mailto:kabrebetasaleel@gmail.com">kabrebetasaleel@gmail.com</a></p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-content">
+      <span class="logo-text">Edu<span>Premium</span></span>
+      <p>© 2026 EduPremium — Tous droits réservés</p>
+      <p>Créé par KABRE Betsaleel 🇧🇫</p>
+    </div>
+  </footer>
+
+</div><!-- fin main-content -->
+
+<script src="app.js"></script>
+<script type="module" src="auth.js"></script>
+</body>
+</html>
