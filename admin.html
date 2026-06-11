@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduPremium — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: #0f0e17; color: #e8e6f0; min-height: 100vh; }
+
+    /* ── LOGIN ── */
+    #login-screen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .login-box {
+      background: #1a1827; border: 1.5px solid #2d2b45;
+      border-radius: 20px; padding: 40px; width: 100%; max-width: 380px;
+    }
+    .login-box h1 { font-size: 1.6rem; margin-bottom: 6px; }
+    .login-box p  { color: #888; font-size: 0.88rem; margin-bottom: 28px; }
+    .login-box input {
+      width: 100%; padding: 13px 16px; background: #12111e;
+      border: 1.5px solid #2d2b45; border-radius: 12px;
+      color: #e8e6f0; font-family: 'Outfit', sans-serif; font-size: 0.92rem;
+      margin-bottom: 12px; outline: none;
+    }
+    .login-box input:focus { border-color: #6c63ff; }
+    .btn-login {
+      width: 100%; padding: 14px; background: #6c63ff; color: white;
+      border: none; border-radius: 12px; font-family: 'Outfit', sans-serif;
+      font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 4px;
+    }
+    .login-error { color: #ff6b6b; font-size: 0.85rem; margin-top: 10px; text-align: center; }
+
+    /* ── ADMIN PANEL ── */
+    #admin-panel { display: none; }
+    .admin-nav {
+      background: #1a1827; border-bottom: 1px solid #2d2b45;
+      padding: 16px 24px; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 100;
+    }
+    .admin-nav h1 { font-size: 1.2rem; }
+    .admin-nav span { color: #888; font-size: 0.82rem; }
+    .logout-btn {
+      background: none; border: 1.5px solid #2d2b45; color: #888;
+      padding: 8px 16px; border-radius: 10px; cursor: pointer;
+      font-family: 'Outfit', sans-serif; font-size: 0.85rem;
+    }
+    .logout-btn:hover { border-color: #ff6b6b; color: #ff6b6b; }
+
+    .admin-body { padding: 24px; max-width: 900px; margin: 0 auto; }
+
+    .stats-row { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+    .stat-card {
+      background: #1a1827; border: 1.5px solid #2d2b45; border-radius: 16px;
+      padding: 20px 24px; flex: 1; min-width: 140px;
+    }
+    .stat-card .stat-num { font-size: 2rem; font-weight: 800; color: #6c63ff; }
+    .stat-card .stat-label { font-size: 0.82rem; color: #888; margin-top: 4px; }
+
+    .section-title {
+      font-size: 1rem; font-weight: 700; color: #888;
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 16px; margin-top: 8px;
+    }
+
+    .commande-card {
+      background: #1a1827; border: 1.5px solid #2d2b45;
+      border-radius: 16px; padding: 20px; margin-bottom: 14px;
+    }
+    .commande-card.validee { border-color: #22c55e44; background: #14221a; }
+
+    .commande-header {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 12px; flex-wrap: wrap;
+    }
+    .commande-nom { font-weight: 700; font-size: 1rem; }
+    .commande-meta { font-size: 0.82rem; color: #888; margin-top: 3px; }
+
+    .badge {
+      padding: 5px 14px; border-radius: 50px; font-size: 0.78rem; font-weight: 700;
+    }
+    .badge-attente  { background: #ff970022; color: #ff9700; }
+    .badge-validee  { background: #22c55e22; color: #22c55e; }
+
+    .commande-docs {
+      margin-top: 14px; padding: 12px; background: #12111e;
+      border-radius: 10px; font-size: 0.85rem; color: #bbb; line-height: 1.8;
+    }
+    .commande-infos {
+      display: flex; gap: 20px; flex-wrap: wrap;
+      margin-top: 12px; font-size: 0.83rem; color: #888;
+    }
+    .commande-infos span strong { color: #e8e6f0; }
+
+    .commande-actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-valider {
+      padding: 10px 20px; background: #22c55e; color: white; border: none;
+      border-radius: 10px; font-family: 'Outfit', sans-serif; font-weight: 700;
+      font-size: 0.88rem; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-valider:hover { opacity: 0.85; }
+    .btn-valider:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-whatsapp {
+      padding: 10px 20px; background: #25d36622; color: #25d366; border: 1.5px solid #25d36644;
+      border-radius: 10px; font-family: 'Outfit', sans-serif; font-weight: 700;
+      font-size: 0.88rem; cursor: pointer; text-decoration: none; display: inline-block;
+    }
+    .btn-rejeter {
+      padding: 10px 20px; background: #ff6b6b22; color: #ff6b6b; border: 1.5px solid #ff6b6b44;
+      border-radius: 10px; font-family: 'Outfit', sans-serif; font-weight: 700;
+      font-size: 0.88rem; cursor: pointer;
+    }
+
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: #888;
+    }
+    .empty-state div { font-size: 2.5rem; margin-bottom: 12px; }
+
+    .toast-admin {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #22c55e; color: white; padding: 12px 24px;
+      border-radius: 50px; font-weight: 700; font-size: 0.88rem;
+      z-index: 9999; opacity: 0; transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .filter-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-tab {
+      padding: 8px 18px; border-radius: 50px; border: 1.5px solid #2d2b45;
+      background: none; color: #888; font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem; cursor: pointer;
+    }
+    .filter-tab.active { background: #6c63ff; border-color: #6c63ff; color: white; }
+
+    @media (max-width: 480px) {
+      .admin-body { padding: 16px; }
+      .commande-header { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── ÉCRAN DE CONNEXION ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <h1>🎓 EduPremium</h1>
+    <p>Panneau d'administration — accès restreint</p>
+    <button class="btn-login" onclick="adminLoginGoogle()" style="display:flex;align-items:center;justify-content:center;gap:10px;">
+      <span>🔵</span> Continuer avec Google
+    </button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ── PANNEAU ADMIN ── -->
+<div id="admin-panel">
+  <nav class="admin-nav">
+    <div>
+      <h1>🎓 EduPremium Admin</h1>
+      <span id="admin-email-display"></span>
+    </div>
+    <button class="logout-btn" onclick="adminLogout()">Se déconnecter</button>
+  </nav>
+
+  <div class="admin-body">
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-total">—</div>
+        <div class="stat-label">Total commandes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-attente" style="color:#ff9700">—</div>
+        <div class="stat-label">En attente</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-validee" style="color:#22c55e">—</div>
+        <div class="stat-label">Validées</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-revenus" style="color:#6c63ff">—</div>
+        <div class="stat-label">Revenus validés (FCFA)</div>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="filtrerCommandes('toutes', this)">Toutes</button>
+      <button class="filter-tab" onclick="filtrerCommandes('en_attente', this)">⏳ En attente</button>
+      <button class="filter-tab" onclick="filtrerCommandes('validee', this)">✅ Validées</button>
+    </div>
+
+    <div class="section-title" id="liste-titre">Commandes</div>
+    <div id="commandes-liste"></div>
+
+  </div>
+</div>
+
+<div class="toast-admin" id="toast-admin"></div>
+
+<script type="module">
+import { initializeApp }         from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, query, orderBy,
+  onSnapshot, doc, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ─── Config Firebase (même projet) ───
+const firebaseConfig = {
+  apiKey: "AIzaSyD4rQ1S1qLiZ0upwkcjVnghucUDKK95pYs",
+  authDomain: "exercices-devoirs-annales.firebaseapp.com",
+  projectId: "exercices-devoirs-annales",
+  storageBucket: "exercices-devoirs-annales.firebasestorage.app",
+  messagingSenderId: "19077695329",
+  appId: "1:19077695329:web:de8d1db36ed54a6e07e720"
+};
+
+// ─── EmailJS Config ───
+const EMAILJS_SERVICE_ID  = "service_zxhpp6i";
+const EMAILJS_TEMPLATE_ID = "template_m8t8esb";
+const EMAILJS_PUBLIC_KEY  = "MRPKM4MGiJMXcUtd0";
+
+// ─── Seul cet email peut accéder à l'admin ───
+const ADMIN_EMAIL = "kabrebetsaleel@gmail.com";
+
+const app           = initializeApp(firebaseConfig);
+const auth          = getAuth(app);
+const db            = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+let toutesLesCommandes = [];
+let filtreActif = 'toutes';
+
+// ── Surveiller auth ──
+onAuthStateChanged(auth, (user) => {
+  if (user && user.email === ADMIN_EMAIL) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-panel').style.display  = 'block';
+    document.getElementById('admin-email-display').textContent = user.email;
+    chargerCommandes();
+  } else if (user) {
+    signOut(auth);
+    document.getElementById('login-error').textContent = '⛔ Accès réservé à l\'administrateur.';
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-panel').style.display  = 'none';
+  }
+});
+
+// ── Connexion Google ──
+window.adminLoginGoogle = async function() {
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+  try {
+    await signInWithPopup(auth, googleProvider);
+  } catch (e) {
+    errEl.textContent = 'Erreur de connexion Google. Réessaie.';
+  }
+}
+
+window.adminLogout = async function() {
+  await signOut(auth);
+}
+
+// ── Charger les commandes en temps réel ──
+function chargerCommandes() {
+  const q = query(collection(db, 'commandes'), orderBy('createdAt', 'desc'));
+  onSnapshot(q, (snapshot) => {
+    toutesLesCommandes = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    majStats();
+    afficherCommandes();
+  });
+}
+
+function majStats() {
+  const total    = toutesLesCommandes.length;
+  const attente  = toutesLesCommandes.filter(c => c.statut === 'en_attente').length;
+  const validees = toutesLesCommandes.filter(c => c.statut === 'validee').length;
+  const revenus  = toutesLesCommandes
+    .filter(c => c.statut === 'validee')
+    .reduce((sum, c) => sum + (c.total || 0), 0);
+
+  document.getElementById('stat-total').textContent   = total;
+  document.getElementById('stat-attente').textContent = attente;
+  document.getElementById('stat-validee').textContent = validees;
+  document.getElementById('stat-revenus').textContent = revenus.toLocaleString('fr-FR');
+}
+
+function afficherCommandes() {
+  const liste = filtreActif === 'toutes'
+    ? toutesLesCommandes
+    : toutesLesCommandes.filter(c => c.statut === filtreActif);
+
+  const container = document.getElementById('commandes-liste');
+  const titre     = document.getElementById('liste-titre');
+
+  titre.textContent = `${liste.length} commande${liste.length > 1 ? 's' : ''}`;
+
+  if (liste.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div>📭</div><p>Aucune commande ici.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = liste.map(c => {
+    const date   = c.createdAt?.toDate?.()
+      ? c.createdAt.toDate().toLocaleString('fr-FR')
+      : 'Date inconnue';
+    const docs   = (c.documents || []).map(d =>
+      `${d.titre} (${d.niveau}) — ${d.prix} FCFA`
+    ).join('<br/>');
+    const waMsg  = encodeURIComponent(
+      `✅ Paiement confirmé !\n\nBonjour ${c.nom}, ton paiement de ${c.total} FCFA a été validé.\nTes documents ont été envoyés à ${c.email || 'WhatsApp'}.\n\nMerci ! 🎓 EduPremium`
+    );
+
+    return `
+      <div class="commande-card ${c.statut === 'validee' ? 'validee' : ''}" id="card-${c.id}">
+        <div class="commande-header">
+          <div>
+            <div class="commande-nom">${c.nom}</div>
+            <div class="commande-meta">${date}</div>
+          </div>
+          <span class="badge ${c.statut === 'validee' ? 'badge-validee' : 'badge-attente'}">
+            ${c.statut === 'validee' ? '✅ Validée' : '⏳ En attente'}
+          </span>
+        </div>
+
+        <div class="commande-docs">${docs}</div>
+
+        <div class="commande-infos">
+          <span>💰 <strong>${c.total} FCFA</strong></span>
+          <span>💳 <strong>${c.moyen}</strong></span>
+          <span>🔢 <strong>${c.transaction}</strong></span>
+          <span>📞 <strong>${c.tel}</strong></span>
+          ${c.email ? `<span>✉️ <strong>${c.email}</strong></span>` : ''}
+          <span>📦 <strong>${c.livraison === 'email' ? 'Email' : 'WhatsApp'}</strong></span>
+        </div>
+
+        ${c.statut === 'en_attente' ? `
+        <div class="commande-actions">
+          <button class="btn-valider" id="btn-${c.id}" onclick="validerCommande('${c.id}')">
+            ✅ Valider et envoyer
+          </button>
+          <a class="btn-whatsapp" href="https://wa.me/${c.tel.replace(/\D/g,'')}?text=${waMsg}" target="_blank">
+            💬 WhatsApp
+          </a>
+          <button class="btn-rejeter" onclick="rejeterCommande('${c.id}')">
+            ❌ Rejeter
+          </button>
+        </div>` : `
+        <div class="commande-actions">
+          <span style="color:#22c55e;font-size:0.85rem;font-weight:700;">✅ Documents envoyés</span>
+        </div>`}
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Filtrer ──
+window.filtrerCommandes = function(filtre, btn) {
+  filtreActif = filtre;
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  afficherCommandes();
+}
+
+// ── Valider une commande → envoyer l'email ──
+window.validerCommande = async function(commandeId) {
+  const commande = toutesLesCommandes.find(c => c.id === commandeId);
+  if (!commande) return;
+
+  const btn = document.getElementById(`btn-${commandeId}`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi en cours...'; }
+
+  try {
+    // ── Charger EmailJS ──
+    await loadEmailJS();
+
+    // ── Construire les données pour l'email ──
+    const lignesDocuments = commande.documents.map(d =>
+      `• ${d.titre} (${d.niveau} · ${d.matiere}) — ${d.prix} FCFA`
+    ).join('\n');
+
+    const liensTxt = commande.documents.map(d =>
+      `• ${d.titre} : ${d.lien_pdf}`
+    ).join('\n');
+
+    // ── Envoyer l'email si livraison = email ──
+    if (commande.livraison === 'email' && commande.email) {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          to_name        : commande.nom,
+          to_email       : commande.email,
+          documents      : lignesDocuments,
+          liens_pdf      : liensTxt,
+          total          : commande.total,
+          moyen_paiement : commande.moyen,
+          transaction    : commande.transaction,
+        },
+        EMAILJS_PUBLIC_KEY
+      );
+    }
+
+    // ── Mettre à jour le statut dans Firestore ──
+    await updateDoc(doc(db, 'commandes', commandeId), {
+      statut:    'validee',
+      valideeAt: serverTimestamp(),
+    });
+
+    toastAdmin('✅ Commande validée — email envoyé !');
+
+  } catch (err) {
+    console.error('Erreur validation:', err);
+    toastAdmin('❌ Erreur — réessaie', true);
+    if (btn) { btn.disabled = false; btn.textContent = '✅ Valider et envoyer'; }
+  }
+}
+
+// ── Rejeter une commande ──
+window.rejeterCommande = async function(commandeId) {
+  if (!confirm('Rejeter cette commande ? Elle sera marquée comme rejetée.')) return;
+  try {
+    await updateDoc(doc(db, 'commandes', commandeId), { statut: 'rejetee' });
+    toastAdmin('Commande rejetée.');
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// ── Charger EmailJS dynamiquement ──
+function loadEmailJS() {
+  return new Promise((resolve, reject) => {
+    if (window.emailjs) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+    s.onload  = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+// ── Toast notification ──
+function toastAdmin(msg, isError = false) {
+  const el = document.getElementById('toast-admin');
+  el.textContent = msg;
+  el.style.background = isError ? '#ff6b6b' : '#22c55e';
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 3000);
+}
+</script>
+</body>
+</html>
